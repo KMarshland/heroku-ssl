@@ -121,11 +121,13 @@ module HerokuSsl
       # Wait a bit for the server to make the request, or just blink. It should be fast.
       sleep(1)
 
+      status = nil
       begin
         status = challenge.authorization.verify_status
-      rescue
-        status = client.authorize(domain: domain).status
       end
+
+      #alternate method to read authorization status
+      status = client.authorize(domain: domain).status if status == 'pending' || status.blank?
 
       unless status == 'valid'
         puts challenge.error
@@ -134,7 +136,13 @@ module HerokuSsl
     end
 
     def request_certificate(domain)
-      authorize domain
+      begin
+        authorize domain
+      rescue RuntimeError => e
+        puts e.message
+        puts 'Retrying domain authorization...'
+        authorize domain
+      end
 
       csr = Acme::Client::CertificateRequest.new(names: [*domain])
 
