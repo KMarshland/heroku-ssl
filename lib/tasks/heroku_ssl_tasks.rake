@@ -13,7 +13,7 @@ namespace :heroku_ssl do
     puts "Attempting to generate ssl certificates for #{app} (registering #{domains} to #{email})"
 
     #generate the certs on the server
-    output = `heroku run rake ssl:generate_certs #{email} #{domains} --app #{app}`
+    output = `unset RUBYOPT; heroku run rake ssl:generate_certs #{email} #{domains} --app #{app}`
 
     #read out the certs to temporary files
     if output.include? '~~ GENERATED CERTIFICATES START ~~'
