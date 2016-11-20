@@ -12,6 +12,12 @@ module HerokuSSL
 
     def redis_instance
 
+      return $redis if $redis.present?
+      return $heroku_ssl_redis if $heroku_ssl_redis.present?
+
+      redis_url = ENV['REDIS_URL'] || ENV['HEROKU_REDIS_URL'] || 'redis://127.0.0.1:6379/0'
+      $heroku_ssl_redis = Redis.new(:url => redis_url)
+
     end
 
     # Where the certificates are stored
