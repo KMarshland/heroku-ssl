@@ -37,6 +37,9 @@ namespace :heroku_ssl do
 
       # clean up
       File.delete('fullchain.pem', 'privkey.pem')
+
+      puts 'Successfully updated Heroku SSL certificates! Now you just need to make sure your DNS is configured to point as follows: '
+      puts `unset RUBYOPT; heroku domains`.split("\n")[4..-1].join("\n")
     else
       puts 'Full log: '
       puts output
