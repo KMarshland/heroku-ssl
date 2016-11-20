@@ -7,13 +7,13 @@ namespace :heroku_ssl do
     STDIN.gets
 
     email = get_email
-    domains = get_domains.join(' ')
+    domains = get_domains
     app = get_app
 
     puts "Attempting to generate ssl certificates for #{app} (registering #{domains} to #{email})"
 
     #generate the certs on the server
-    output = `unset RUBYOPT; heroku run rake ssl:generate_certs #{email} #{domains} --app #{app}`
+    output = `unset RUBYOPT; heroku run rake heroku_ssl:generate_certs #{email} #{domains} --app #{app}`
 
     #read out the certs to temporary files
     if output.include? '~~ GENERATED CERTIFICATES START ~~'
@@ -42,7 +42,7 @@ namespace :heroku_ssl do
       puts output
       puts ''
 
-      puts 'Could not generate certificates. Please try again later or try running `heroku run rake ssk:generate_certs` directly'
+      puts 'Could not generate certificates. Please try again later or try running `heroku run rake heroku_ssl:generate_certs` directly'
     end
 
   end
@@ -93,8 +93,30 @@ namespace :heroku_ssl do
   end
 
   def get_domains
-    STDOUT.puts 'Enter the domain to register: '
-    STDIN.gets.strip.split ' '
+    return @domain if @domain.present?
+
+    domains = `unset RUBYOPT; heroku domains`.split("\n").select(&:present?)[5..-1]
+    domains.map! do |domain|
+      domain.split(/\s+/).first
+    end
+    @domain = domains.join ' '
+
+    default_prompt = ''
+    default_prompt = " [#{@domain}]" if @domain.present?
+
+    new_domain = nil
+    while new_domain.blank?
+      STDOUT.puts "Enter the domain to register#{default_prompt}: "
+      new_domain = STDIN.gets
+
+      if new_domain.blank?
+        new_domain = @domain
+      else
+        new_domain.strip!
+      end
+    end
+
+    @domain = new_domain
   end
 
   def get_app
