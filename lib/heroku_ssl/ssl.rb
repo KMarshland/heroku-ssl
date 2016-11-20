@@ -108,11 +108,7 @@ module HerokuSSL
       # This example is using the http-01 challenge type. Other challenges are dns-01 or tls-sni-01.
       challenge = authorization.http01
 
-      # Save the file. We'll create a public directory to serve it from, and inside it we'll create the challenge file.
-      FileUtils.mkdir_p( Rails.root.join( 'public', File.dirname( challenge.filename ) ) )
-
-      # We'll write the content of the file
-      File.write( Rails.root.join( 'public', challenge.filename), challenge.file_content )
+      redis_instance.set("ssl-challenge-#{challenge.filename.split('/').last}", challenge.file_content)
 
       challenge.request_verification
 
