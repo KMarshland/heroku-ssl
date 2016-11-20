@@ -6,11 +6,19 @@ namespace :heroku_ssl do
 
     STDIN.gets
 
+    email = get_email
+    domains = get_domains.join(' ')
+    app = get_app
+
+    puts "Attempting to generate ssl certificates for #{app} (registering #{domains} to #{email})"
+
     #generate the certs on the server
-    output = `heroku run rake ssl:generate_certs #{get_email} #{get_domains.join(' ')} --app #{get_app}`
+    output = `heroku run rake ssl:generate_certs #{email} #{domains} --app #{app}`
 
     #read out the certs to temporary files
     if output.include? '~~ GENERATED CERTIFICATES START ~~'
+      puts 'Successfully generated certificates! Attempting to update Heroku DNS'
+
       output = output.split('~~ GENERATED CERTIFICATES START ~~').last
                    .split('~~ GENERATED CERTIFICATES END ~~').first
       output = JSON(output)
@@ -91,11 +99,12 @@ namespace :heroku_ssl do
 
     default_prompt = ''
     default_prompt = " [#{@app}]" if @app.present?
-    STDOUT.puts "Enter the heroku app#{default_prompt}: "
 
     new_app = nil
     while new_app.blank?
+      STDOUT.puts "Enter the heroku app#{default_prompt}: "
       new_app = STDIN.gets
+
       if new_app.blank?
         new_app = @app
       else

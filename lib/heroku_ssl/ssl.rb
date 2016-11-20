@@ -115,6 +115,7 @@ module HerokuSsl
       challenge = authorization.http01
 
       redis_instance.set("ssl-challenge-#{challenge.filename.split('/').last}", challenge.file_content)
+      redis_instance.expire("ssl-challenge-#{challenge.filename.split('/').last}", 5.minutes)
 
       challenge.request_verification
 
