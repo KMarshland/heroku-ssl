@@ -36,12 +36,13 @@ namespace :heroku_ssl do
     email = (ARGV[1] || '').strip
     email = get_email if email.blank?
 
+    puts "Registering #{email}"
     HerokuSsl::register email
 
     domain = ARGV[2..-1]
     domain = get_domains if domain.blank?
 
-    puts "Registering #{email} for #{domain}"
+    puts "Authorizing and generating certificates for #{domain}"
 
     certs = HerokuSsl::request_certificate domain
 
@@ -57,6 +58,7 @@ namespace :heroku_ssl do
       email = STDIN.gets
       email.strip! if email.present?
     end
+    email
   end
 
   def get_domains
