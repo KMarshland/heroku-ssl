@@ -46,6 +46,8 @@ namespace :heroku_ssl do
 
     certs = HerokuSsl::request_certificate domain
 
+    puts certs.inspect
+
     STDOUT.puts '~~ GENERATED CERTIFICATES START ~~'
     STDOUT.puts JSON(certs)
     STDOUT.puts '~~ GENERATED CERTIFICATES END ~~'

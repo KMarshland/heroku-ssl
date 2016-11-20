@@ -137,22 +137,26 @@ module HerokuSsl
       end
     end
 
-    def try_authorize(domain)
+    def try_authorize(domain, retries=1)
       begin
         authorize domain
+        return true
       rescue RuntimeError => e
-        yield e
+        puts error.message
+
+        if retries > 0
+          puts 'Retrying domain authorization...'
+          return try_authorize domain, retries-1
+        else
+          return false
+        end
       end
     end
 
     def request_certificate(domain)
-      try_authorize domain do |error|
-        puts error.message
-        puts 'Retrying domain authorization...'
-        try_authorize domain do |second_error|
-          puts 'Domain authorization failed. Cannot get certificates'
-          return
-        end
+      unless try_authorize domain
+        puts 'Domain authorization failed. Attempting to proceed with partial verification'
+        return
       end
 
       csr = Acme::Client::CertificateRequest.new(names: [*domain])
