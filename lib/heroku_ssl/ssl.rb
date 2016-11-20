@@ -1,7 +1,7 @@
 require 'openssl'
 require 'acme-client'
 
-module HerokuSSL
+module HerokuSsl
 
   class << self
     def endpoint

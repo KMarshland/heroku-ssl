@@ -17,6 +17,11 @@ Add this line to your application's Gemfile:
 gem 'heroku-ssl'
 ```
 
+Or, to test the bleeding edge version:
+```ruby
+gem 'heroku_ssl', git: 'https://github.com/KMarshland/heroku-ssl.git'
+```
+
 And then execute:
 ```bash
 $ bundle install
