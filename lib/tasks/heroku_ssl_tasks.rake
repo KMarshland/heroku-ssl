@@ -38,6 +38,10 @@ namespace :heroku_ssl do
       # clean up
       File.delete('fullchain.pem', 'privkey.pem')
     else
+      puts 'Full log: '
+      puts output
+      puts ''
+
       puts 'Could not generate certificates. Please try again later or try running `heroku run rake ssk:generate_certs` directly'
     end
 
@@ -65,13 +69,27 @@ namespace :heroku_ssl do
   end
 
   def get_email
-    email = nil
-    while email.blank? do
-      STDOUT.puts 'Enter your email address: '
-      email = STDIN.gets
-      email.strip! if email.present?
+    return @email if @email.present?
+
+    @email = `git config user.email`
+    @email.strip! if @email.present?
+
+    default_prompt = ''
+    default_prompt = " [#{@email}]" if @email.present?
+
+    new_email = nil
+    while new_email.blank?
+      STDOUT.puts "Enter your email#{default_prompt}: "
+      new_email = STDIN.gets
+
+      if new_email.blank?
+        new_email = @email
+      else
+        new_email.strip!
+      end
     end
-    email
+
+    @email = new_email
   end
 
   def get_domains
