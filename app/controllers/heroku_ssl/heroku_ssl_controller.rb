@@ -4,7 +4,7 @@ module HerokuSsl
   class HerokuSslController < ApplicationController
 
     def challenge
-      response = HerokuSSL::redis_instance.get("ssl-challenge-#{params[:challenge]}")
+      response = HerokuSsl::redis_instance.get("ssl-challenge-#{params[:challenge]}")
       render text: response
     end
 

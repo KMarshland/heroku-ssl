@@ -155,7 +155,8 @@ module HerokuSsl
 
     def request_certificate(domain)
       unless try_authorize domain
-        puts 'Domain authorization failed. Attempting to proceed with partial verification'
+        puts 'Domain authorization failed. Aborting operation'
+        return
       end
 
       csr = Acme::Client::CertificateRequest.new(names: [*domain])

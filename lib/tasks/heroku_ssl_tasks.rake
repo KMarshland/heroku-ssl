@@ -10,25 +10,28 @@ namespace :heroku_ssl do
     output = `heroku run rake ssl:generate_certs #{get_email} #{get_domains.join(' ')} --app #{get_app}`
 
     #read out the certs to temporary files
-    output = output.match(/~~/).to_s
-                 .split('~~ GENERATED CERTIFICATES START ~~').last
-                 .split('~~ GENERATED CERTIFICATES END ~~').first
-    output = JSON(output)
+    if output.include? '~~ GENERATED CERTIFICATES START ~~'
+      output = output.split('~~ GENERATED CERTIFICATES START ~~').last
+                   .split('~~ GENERATED CERTIFICATES END ~~').first
+      output = JSON(output)
 
-    File.open('fullchain.pem', 'wb') do |file|
-      file.write output['fullchain']
+      File.open('fullchain.pem', 'wb') do |file|
+        file.write output['fullchain']
+      end
+
+      File.open('privkey.pem', 'wb') do |file|
+        file.write output['privkey']
+      end
+
+      # update heroku certs
+      # RUBYOPT breaks the heroku command for some reason, so you have to unset it
+      `unset RUBYOPT; heroku certs:update fullchain.pem privkey.pem --app #{get_app} --confirm #{get_app}`
+
+      # clean up
+      File.delete('fullchain.pem', 'privkey.pem')
+    else
+      puts 'Could not generate certificates. Please try again later or try running `heroku run rake ssk:generate_certs` directly'
     end
-
-    File.open('privkey.pem', 'wb') do |file|
-      file.write output['privkey']
-    end
-
-    # update heroku certs
-    # RUBYOPT breaks the heroku command for some reason, so you have to unset it
-    `unset RUBYOPT; heroku certs:update fullchain.pem privkey.pem --app #{get_app} --confirm #{get_app}`
-
-    # clean up
-    File.delete('fullchain.pem', 'privkey.pem')
 
   end
 
