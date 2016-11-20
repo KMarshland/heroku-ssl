@@ -123,7 +123,9 @@ module HerokuSsl
 
       status = nil
       begin
+        # May sometimes give an error, for mysterious reasons
         status = challenge.authorization.verify_status
+      rescue
       end
 
       #alternate method to read authorization status
@@ -135,13 +137,22 @@ module HerokuSsl
       end
     end
 
-    def request_certificate(domain)
+    def try_authorize(domain)
       begin
         authorize domain
       rescue RuntimeError => e
-        puts e.message
+        yield e
+      end
+    end
+
+    def request_certificate(domain)
+      try_authorize domain do |error|
+        puts error.message
         puts 'Retrying domain authorization...'
-        authorize domain
+        try_authorize domain do |second_error|
+          puts 'Domain authorization failed. Cannot get certificates'
+          return
+        end
       end
 
       csr = Acme::Client::CertificateRequest.new(names: [*domain])
