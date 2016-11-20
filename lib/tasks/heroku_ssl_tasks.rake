@@ -33,7 +33,7 @@ namespace :heroku_ssl do
   end
 
   task :generate_certs do
-    email = ARGV[1].strip
+    email = (ARGV[1] || '').strip
     email = get_email if email.blank?
 
     HerokuSsl::register email
