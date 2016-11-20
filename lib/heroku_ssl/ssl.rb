@@ -131,7 +131,7 @@ module HerokuSSL
     def request_certificate(domain)
       authorize domain
 
-      csr = Acme::Client::CertificateRequest.new(names: [domain])
+      csr = Acme::Client::CertificateRequest.new(names: [*domain])
 
       # We can now request a certificate. You can pass anything that returns
       # a valid DER encoded CSR when calling to_der on it. For example an

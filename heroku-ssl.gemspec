@@ -9,10 +9,10 @@ Gem::Specification.new do |s|
   s.version     = HerokuSSL::VERSION
   s.authors     = ["Kai Marshland"]
   s.email       = ["kaimarshland@gmail.com"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Heroku::Ssl."
-  s.description = "TODO: Description of Heroku::Ssl."
-  s.license     = "MIT"
+  s.homepage    = 'https://github.com/KMarshland/heroku-ssl'
+  s.summary     = "Quickly and easily add SSL to a Rails App with Let's Encrypt"
+  s.description = 'Designed for Heroku, but can be adapted for other hosts as well'
+  s.license     = 'MIT'
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 

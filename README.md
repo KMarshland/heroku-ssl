@@ -8,7 +8,7 @@ Then, you can simply run `rake ssl:update_heroku_certs`
 ## Usage outside of Heroku
 Although designed for Heroku, it can generate certificates on other providers. 
 To do so, on your server, run `rake ssl:generate_certs`.
-This will print a public and a private key to the console, which you an do with what you will.
+This will print a public and a private key to the console, which you can do with what you will.
 
 ## Installation
 Add this line to your application's Gemfile:
