@@ -6,7 +6,7 @@ require "heroku_ssl/version"
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = "heroku-ssl"
-  s.version     = Heroku::Ssl::VERSION
+  s.version     = HerokuSSL::VERSION
   s.authors     = ["Kai Marshland"]
   s.email       = ["kaimarshland@gmail.com"]
   s.homepage    = "TODO"
