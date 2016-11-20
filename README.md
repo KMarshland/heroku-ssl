@@ -3,7 +3,7 @@ With the advent of free SSL from [Let's Encrypt](https://letsencrypt.org/), SSL 
 
 ## Usage on Heroku
 Add this gem to your gemfile, then deploy it to heroku. 
-Then, you can simply run `rake ssl:update_heroku_certs`
+Then, you can simply run `rake heroku_ssl:update_certs`
 
 This should prompt you for everything you need to update your shiny new SSL certificate! 
 The only thing left to do will be to [configure your DNS correctly](https://devcenter.heroku.com/articles/ssl-endpoint#dns-and-domain-configuration). 
@@ -11,7 +11,7 @@ You'll also want to make sure that the domain had been added to heroku with `her
 
 ## Usage outside of Heroku
 Although designed for Heroku, it can generate certificates on other providers. 
-To do so, on your server, run `rake ssl:generate_certs`.
+To do so, on your server, run `rake heroku_ssl:generate_certs`.
 This will print a JSON encoded set of PEM keys to the console.
 You can download these (you will likely want to use `privkey` and `fullchain` as your public and private keys respectively) 
 and add them to your own servers and configure the DNS yourself.
