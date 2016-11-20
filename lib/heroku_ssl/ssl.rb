@@ -142,7 +142,7 @@ module HerokuSsl
         authorize domain
         return true
       rescue RuntimeError => e
-        puts error.message
+        puts e.message
 
         if retries > 0
           puts 'Retrying domain authorization...'
