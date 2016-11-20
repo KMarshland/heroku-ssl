@@ -121,7 +121,12 @@ module HerokuSsl
       # Wait a bit for the server to make the request, or just blink. It should be fast.
       sleep(1)
 
-      status = client.authorize(domain: domain).status
+      begin
+        status = challenge.authorization.verify_status
+      rescue
+        status = client.authorize(domain: domain).status
+      end
+
       unless status == 'valid'
         puts challenge.error
         raise "Did not verify client. Status is still #{status}"
