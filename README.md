@@ -4,7 +4,7 @@ This gem allows you to generate and add an SSL certificate simply by running a r
 
 ## Usage on Heroku
 Add this gem to your gemfile, then deploy it to heroku. 
-Then, you can simply run `rake ssl:update_heroku_certs`
+Then, you can simply run `rake heroku_ssl:update_certs`
 
 This should prompt you for everything you need to update your shiny new SSL certificate! 
 The only thing left to do will be to [configure your DNS correctly](https://devcenter.heroku.com/articles/ssl-endpoint#dns-and-domain-configuration). 
@@ -12,7 +12,7 @@ You'll also want to make sure that the domain had been added to heroku with `her
 
 ## Usage outside of Heroku
 Although designed for Heroku, it can generate certificates on other providers. 
-To do so, on your server, run `rake ssl:generate_certs`.
+To do so, on your server, run `rake heroku_ssl:generate_certs`.
 This will print a JSON encoded set of PEM keys to the console.
 You can download these (you will likely want to use `privkey` and `fullchain` as your public and private keys respectively) 
 and add them to your own servers and configure the DNS yourself.
@@ -76,7 +76,7 @@ www.kaimarshland.com.herokudns.com.
 The TTL, or Time To Live, is set to 10800 seconds, which determines how long DNS information will be cached for.
 
 ### How can I add a certificate generated with this manually?
-After running `rake ssl:generate_certs` on your server, which will print out a JSON object with your generated 
+After running `rake heroku_ssl:generate_certs` on your server, which will print out a JSON object with your generated 
 certificates in it, you'll need to take the fullchain and the privkey and add them to your HTTP server. 
 
 On nginx, this looks like creating a new server block something like:
@@ -111,7 +111,7 @@ SSLCertificateChainFile /path/to/chain.pem
 ### What's the deal with certificate expiration?
 Certificates expire after 90 days -- you can read about why on 
 [Let's Encrypt](https://letsencrypt.org/2015/11/09/why-90-days.html).
-You'll get an email as the expiration date approaches, at which point you'll have to rerun `rake ssl:generate_certs`.
+You'll get an email as the expiration date approaches, at which point you'll have to rerun `rake heroku_ssl:generate_certs`.
 We're looking into ways to renew the certificates automatically; however, at the moment the Heroku API doesn't let us.
 
 ## License
