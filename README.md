@@ -21,7 +21,7 @@ and add them to your own servers and configure the DNS yourself.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'heroku-ssl'
+gem 'heroku_ssl'
 ```
 
 Or, to test the bleeding edge version:
@@ -64,7 +64,7 @@ If your site is already pointed to your Heroku app, there will already be a CNAM
 you just need to change where it points to. 
 If not, you'll need to add a new line:
 ```
-[subdomain] [TTL] IN CNAME [yourdomain].herokudns.com
+[subdomain] [TTL] IN CNAME [yourdomain].herokudns.com.
 ```
 
 For example, I have
