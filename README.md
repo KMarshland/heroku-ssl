@@ -24,11 +24,6 @@ Add this line to your application's Gemfile:
 gem 'heroku-ssl'
 ```
 
-Or, to test the bleeding edge version:
-```ruby
-gem 'heroku_ssl', git: 'https://github.com/KMarshland/heroku-ssl.git'
-```
-
 And then execute:
 ```bash
 $ bundle install
@@ -38,6 +33,8 @@ It also requires one of the following:
 - The global variable `$redis` is set
 - The environment variable `REDIS_URL` is set
 - The environment variable `HEROKU_REDIS_URL` is set
+
+Note that this means you need to have a live version of redis; on Heroku the free tier will work: https://elements.heroku.com/addons/heroku-redis.
 
 ## Contributing
 Submit a pull request!
