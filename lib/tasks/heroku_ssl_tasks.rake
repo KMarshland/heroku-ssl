@@ -13,7 +13,7 @@ namespace :heroku_ssl do
     puts "Attempting to generate ssl certificates for #{app} (registering #{domains} to #{email})"
 
     #generate the certs on the server
-    output = `unset RUBYOPT; heroku run rake heroku_ssl:generate_certs #{email} #{domains} --app #{app}`
+    output = heroku_run("run rake heroku_ssl:generate_certs #{email} #{domains} --app #{app}")
 
     #read out the certs to temporary files
     if output.include? '~~ GENERATED CERTIFICATES START ~~'
@@ -32,14 +32,13 @@ namespace :heroku_ssl do
       end
 
       # update heroku certs
-      # RUBYOPT breaks the heroku command for some reason, so you have to unset it
-      `unset RUBYOPT; heroku certs:update fullchain.pem privkey.pem --app #{get_app} --confirm #{get_app}`
+      heroku_run("certs:update fullchain.pem privkey.pem --app #{get_app} --confirm #{get_app}")
 
       # clean up
       File.delete('fullchain.pem', 'privkey.pem')
 
       puts 'Successfully updated Heroku SSL certificates! Now you just need to make sure your DNS is configured to point as follows: '
-      puts `unset RUBYOPT; heroku domains`.split("\n")[4..-1].join("\n")
+      puts heroku_run('domains').split("\n")[4..-1].join("\n")
     else
       puts 'Full log: '
       puts output
@@ -95,10 +94,32 @@ namespace :heroku_ssl do
     @email = new_email
   end
 
+  def heroku_run(command)
+    # RUBYOPT breaks the heroku command for some reason, so you have to unset it
+    result = `unset RUBYOPT; heroku #{command}`
+
+    if result =~ /rake\saborted/i
+      puts "Don't know how to build task -- make sure you have deployed a version with this gem installed to heroku"
+    end
+
+    if result =~ /No\ssuch\sfile\sor\sdirectory/i || result =~ /command\snot\sfound/i
+      puts 'Cannot run command heroku -- are you sure you have it installed?'
+    end
+
+    if result =~ /Bundler::GemNotFound/i
+      puts 'Please log in to heroku by running `heroku login`'
+    end
+
+    result
+  end
+
   def get_domains
     return @domain if @domain.present?
 
-    domains = `unset RUBYOPT; heroku domains`.split("\n").select(&:present?)[5..-1]
+    domains = heroku_run('domains').split("\n").select(&:present?)[5..-1]
+    if domains.blank?
+      raise 'Could not load domains'
+    end
     domains.map! do |domain|
       domain.split(/\s+/).first
     end
@@ -125,7 +146,7 @@ namespace :heroku_ssl do
   def get_app
     return @app if @app.present?
 
-    @apps = @apps || `unset RUBYOPT; heroku apps`.split("\n")
+    @apps = @apps || heroku_run('apps').split("\n")
     remotes = `git remote -v`.split("\n").map do |r|
       r.split("\t").last
     end
