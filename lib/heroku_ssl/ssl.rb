@@ -1,5 +1,6 @@
 require 'openssl'
 require 'acme-client'
+require 'redis'
 
 module HerokuSsl
 
