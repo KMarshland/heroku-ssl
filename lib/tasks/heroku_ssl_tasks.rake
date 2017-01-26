@@ -1,3 +1,4 @@
+require 'redis'
 
 namespace :heroku_ssl do
 
@@ -118,7 +119,8 @@ namespace :heroku_ssl do
 
     domains = heroku_run('domains').split("\n").select(&:present?)[5..-1]
     if domains.blank?
-      raise 'Could not load domains'
+      puts 'Warning: Could not load domains'
+      domains = []
     end
     domains.map! do |domain|
       domain.split(/\s+/).first
