@@ -98,7 +98,7 @@ namespace :heroku_ssl do
 
     new_email = nil
     while new_email.blank?
-      STDOUT.puts "Enter your email#{default_prompt}: "
+      STDOUT.puts "Enter your email (used to notify you of expiration)#{default_prompt}: "
       new_email = STDIN.gets
 
       if new_email.blank?
