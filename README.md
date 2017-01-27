@@ -4,6 +4,7 @@ This gem allows you to generate and add an SSL certificate simply by running a r
 
 ## Usage on Heroku
 Add this gem to your gemfile, then deploy it to heroku. 
+Add a free redis instance ([https://elements.heroku.com/addons/heroku-redis](https://elements.heroku.com/addons/heroku-redis)) if you do not have one.
 Then, you can simply run `rake heroku_ssl:update_certs`
 
 This should prompt you for everything you need to update your shiny new SSL certificate! 
