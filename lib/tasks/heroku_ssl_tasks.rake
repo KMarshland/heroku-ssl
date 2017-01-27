@@ -1,51 +1,7 @@
 namespace :heroku_ssl do
 
   task :update_certs do
-    STDOUT.puts 'Once your app has been deployed to Heroku, hit enter.'
-
-    STDIN.gets
-
-    email = get_email
-    domains = get_domains
-    app = get_app
-
-    puts "Attempting to generate ssl certificates for #{app} (registering #{domains} to #{email})"
-
-    #generate the certs on the server
-    output = heroku_run("run rake heroku_ssl:generate_certs #{email} #{domains} --app #{app}")
-
-    #read out the certs to temporary files
-    if output.include? '~~ GENERATED CERTIFICATES START ~~'
-      puts 'Successfully generated certificates! Attempting to update Heroku DNS'
-
-      output = output.split('~~ GENERATED CERTIFICATES START ~~').last
-                   .split('~~ GENERATED CERTIFICATES END ~~').first
-      output = JSON(output)
-
-      File.open('fullchain.pem', 'wb') do |file|
-        file.write output['fullchain']
-      end
-
-      File.open('privkey.pem', 'wb') do |file|
-        file.write output['privkey']
-      end
-
-      # update heroku certs
-      heroku_run("certs:update fullchain.pem privkey.pem --app #{get_app} --confirm #{get_app}")
-
-      # clean up
-      File.delete('fullchain.pem', 'privkey.pem')
-
-      puts 'Successfully updated Heroku SSL certificates! Now you just need to make sure your DNS is configured to point as follows: '
-      puts heroku_run('domains').split("\n")[4..-1].join("\n")
-    else
-      puts 'Full log: '
-      puts output
-      puts ''
-
-      puts 'Could not generate certificates. Please try again later or try running `heroku run rake heroku_ssl:generate_certs` directly'
-    end
-
+    update_certs
   end
 
   task :generate_certs do
@@ -67,6 +23,63 @@ namespace :heroku_ssl do
       STDOUT.puts JSON(certs)
       STDOUT.puts '~~ GENERATED CERTIFICATES END ~~'
     end
+  end
+
+  def update_certs
+    STDOUT.puts 'Once your app has been deployed to Heroku, hit enter.'
+
+    STDIN.gets
+
+    email = get_email
+    domains = get_domains
+    app = get_app
+
+    puts "Attempting to generate ssl certificates for #{app} (registering #{domains} to #{email})"
+
+    #generate the certs on the server
+    output = heroku_run("run rake heroku_ssl:generate_certs #{email} #{domains} --app #{app}")
+
+    #read out the certs to temporary files
+    unless output.include? '~~ GENERATED CERTIFICATES START ~~'
+      puts 'Full log: '
+      puts output
+      puts ''
+
+      puts 'Could not generate certificates. Please try again later or try running `heroku run rake heroku_ssl:generate_certs` directly'
+      return
+    end
+
+    output = output.split('~~ GENERATED CERTIFICATES START ~~').last
+                 .split('~~ GENERATED CERTIFICATES END ~~').first
+    output = JSON(output).with_indifferent_access
+
+    unless output['fullchain'].present? && output['privkey'].present?
+      puts 'Output: '
+      puts output
+      puts ''
+
+      puts 'Failed to read certificates'
+      return
+    end
+
+    puts 'Successfully generated certificates! Attempting to update Heroku DNS'
+
+    File.open('fullchain.pem', 'wb') do |file|
+      file.write output['fullchain']
+    end
+
+    File.open('privkey.pem', 'wb') do |file|
+      file.write output['privkey']
+    end
+
+    # update heroku certs
+    heroku_run("certs:update fullchain.pem privkey.pem --app #{get_app} --confirm #{get_app}")
+
+    # clean up
+    File.delete('fullchain.pem', 'privkey.pem')
+
+    puts 'Successfully updated Heroku SSL certificates! Now you just need to make sure your DNS is configured to point as follows: '
+    puts heroku_run('domains').split("\n")[4..-1].join("\n")
   end
 
   def get_email
