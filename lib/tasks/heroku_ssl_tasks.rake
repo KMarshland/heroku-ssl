@@ -164,7 +164,7 @@ namespace :heroku_ssl do
   def get_app
     return @app if @app.present?
 
-    @apps = @apps || heroku_run('apps').split("\n")
+    @apps = @apps || heroku_run('apps').split("\n").map(&:split).map(&:first).select(&:present?)
     remotes = `git remote -v`.split("\n").map do |r|
       r.split("\t").last
     end
