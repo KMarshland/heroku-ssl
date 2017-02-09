@@ -74,10 +74,11 @@ namespace :heroku_ssl do
     end
 
     # update heroku certs
-    certs_response = heroku_run("certs:update fullchain.pem privkey.pem --app #{get_app} --confirm #{get_app}")
 
-    if certs_response =~ /has\sno\sSSL\scertificates/i
+    if heroku_run('certs') =~ /has\sno\sSSL\scertificates/i
       heroku_run("certs:add fullchain.pem privkey.pem --app #{get_app} --confirm #{get_app}")
+    else
+      heroku_run("certs:update fullchain.pem privkey.pem --app #{get_app} --confirm #{get_app}")
     end
 
     # clean up
