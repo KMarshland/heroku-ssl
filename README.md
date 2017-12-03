@@ -1,3 +1,6 @@
+# NOTE: Heroku now offers their own Let's Encrypt integration. We recommend using it instead
+This gem will no longer be kept updated.
+
 # Heroku SSL
 With the advent of free SSL from [Let's Encrypt](https://letsencrypt.org/), SSL should be as easy as clicking a button.
 This gem allows you to generate and add an SSL certificate simply by running a rake task. 
