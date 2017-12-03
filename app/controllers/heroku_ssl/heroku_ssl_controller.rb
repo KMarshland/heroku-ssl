@@ -5,7 +5,7 @@ module HerokuSsl
 
     def challenge
       response = HerokuSsl::redis_instance.get("ssl-challenge-#{params[:challenge]}")
-      render text: response
+      render plain: response
     end
 
   end
